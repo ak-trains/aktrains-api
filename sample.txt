@@ -1,0 +1,13 @@
+Permanant Auth Data:
+
+Plain Secret:
+{
+  "timeStamp":"2022-11-24T10:38:00",
+  "appId":"313052db-33f2-4797-b983-01a056b097cd",
+  "appVer":"6.0",
+  "apiKey":"e0fb071814d805277350f4f2c421dc1d95fa6cf036fdc65f849a7eca04e61712"
+}
+
+Headers:
+secret->U2FsdGVkX19e0FdUTZB7wRt8ZBqYw8xE0kQqP263kcHX7nhbIQQYgVTk5IOpVVLnDjn6NPeUnK229ZfgHrrvU6Df1LMQK+dM2c2Q3qjyjGH4RtcPw4dENlrN/nOdU+ZKUAd34VMu8nv/9NApM84+d7BsQFqHoF1LRXcZ+FPU25D8d7tjnSTyu1pdMeBGo7ysk25w/J7ikDA/YVIQPS7GGfBzIp9OqDpnlj7Zmi9lS6rndKbB1bJN8XCrOzKW3hEE
+signature->a3980ca4c6fd859faef245297c207168fbcbaaee88d99332017442b00e2f107c
