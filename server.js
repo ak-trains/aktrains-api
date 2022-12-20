@@ -23,7 +23,7 @@ app.use(errorHandler);
         Caption: "Intel64 Family 6 Model 158 Stepping 9",
         Family: 205,
         Name: "Intel(R) Core(TM) i5-7300HQ CPU @ 2.50GHz",
-        NumberOfCores: 6,
+        NumberOfCores: 8,
         ProcessorId: "BFEBFBFF000906E9",
         SerialNumber: "To Be Filled By O.E.M.",
         SocketDesignation: "U3E1",
@@ -89,12 +89,12 @@ app.use(errorHandler);
     ],
   };
   
-  const sorted = jks.sort(system,true);
-  const signature = CryptoJS.SHA256(JSON.stringify(sorted)).toString();
-  sorted.createdAt= "20221219T171332";
-  sorted.deletedAt= "N/A";
-  const payload = {system:sorted,signature:signature};
-  const token = CustomJwtService.signSystemToken(payload);
-  console.log(token);
+  // const sorted = jks.sort(system,true);
+  // const signature = CryptoJS.SHA256(JSON.stringify(sorted)).toString();
+  // sorted.createdAt= "20221219T171332";
+  // sorted.deletedAt= "N/A";
+  // const payload = {system:sorted,signature:signature};
+  // const token = CustomJwtService.signSystemToken(payload);
+  // console.log(token);
 
 app.listen(APP_PORT,()=>console.log(`Listening on port ${APP_PORT}`));

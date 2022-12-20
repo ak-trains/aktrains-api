@@ -13,6 +13,7 @@ import { validationResult } from "express-validator";
 
 const database = DB;
 const usersRef = database.ref("users");
+const historyRef = database.ref("history");
 const eligiblesRef = database.ref("eligibles");
 
 const authController = {
@@ -42,6 +43,12 @@ const authController = {
             const isTampered = CustomHelperSerice.checkSignature(user);
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess());
+            
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"login");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests());
 
             const match = await bcrypt.compare(req.body.password,user.info.password);
 
@@ -51,7 +58,7 @@ const authController = {
 
             const onlinePayload = {uid:user.uid,email:user.email,isAuth:true};
 
-            const offlinePayload = {user};
+            const offlinePayload = {uid:user.uid};
 
             const onlineToken = CustomJwtService.signOnlineToken(onlinePayload);
             const offlineToken = CustomJwtService.signOfflineToken(offlinePayload);
@@ -75,6 +82,10 @@ const authController = {
             document.signature = signature;
 
             await usersRef.child(user.uid).update(document);
+
+            const history = {snapshot:user.auth,event:"login"};
+
+            await historyRef.child(user.uid).push().set(history);
 
             const response = {
                 status:200,
@@ -136,32 +147,39 @@ const authController = {
                 country:req.body.country,
                 secret:secKey,
                 password:pass,
-                isBanned:false,
-                createdAt:timeStamp,            
+                isBanned:false,       
                 updatedAt:timeStamp,
             };
 
             const auth = {
-                appInstalled:true,
                 onlineToken:"N/A",
                 offlineToken:"N/A",
                 challengeToken:"N/A",
                 ipAddress:ip,
-                lastLoginAt:"N/A",
-                createdAt:timeStamp,            
+                lastLoginAt:"N/A",          
                 updatedAt:timeStamp,
             };
 
             const system = {
-                current:"N/A",
-                history:"N/A",
-                createdAt:timeStamp,            
+                details:"N/A",          
                 updatedAt:timeStamp,
             };
 
             const library={
-                addons:"N/A",
-                createdAt:timeStamp,            
+                addons:"N/A",          
+                updatedAt:timeStamp,
+            }
+
+            const count={
+                login:0,
+                logout:0,
+                challenge:0,
+                validate:0,
+                password:0,
+                sysReset:0,
+                sysCheck:0,
+                library:0,
+                countOf:timeStamp.substring(0,8),
                 updatedAt:timeStamp,
             }
             
@@ -172,6 +190,7 @@ const authController = {
                 auth:auth,
                 system:system,
                 library:library,
+                count:count,
                 createdAt:timeStamp,
                 updatedAt:timeStamp,
             }
@@ -183,6 +202,10 @@ const authController = {
             document.signature = signature;
 
             await usersRef.child(uuid).set(document);
+
+            const history = {snapshot:document.auth,event:"register"};
+
+            await historyRef.child(user.uid).push().set(history);
 
             const transporter = nodemailer.createTransport({
                 host:"us2.smtp.mailhostbox.com",
@@ -247,6 +270,14 @@ const authController = {
             const isTampered = CustomHelperSerice.checkSignature(user);
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess());
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"challenge");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests());
+
+            if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess());
             
             const code = otpGenerator.generate(8,{upperCaseAlphabets:true,lowerCaseAlphabets:false,specialChars:false,digits:true});
             
@@ -269,6 +300,10 @@ const authController = {
             document.signature = signature;
 
             await usersRef.child(user.uid).update(document);
+
+            const history = {snapshot:user.auth,event:"challenge"};
+
+            await historyRef.child(user.uid).push().set(history);
 
             const transporter = nodemailer.createTransport({
                 host:"us2.smtp.mailhostbox.com",
@@ -341,6 +376,12 @@ const authController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess());
 
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"validate");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests());
+
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess());
             
             let payload;
@@ -380,6 +421,10 @@ const authController = {
             document.signature = signature;
 
             await usersRef.child(user.uid).update(document);
+
+            const history = {snapshot:user.auth,event:"validate"};
+
+            await historyRef.child(user.uid).push().set(history);
 
             const response = {
                 status:200,

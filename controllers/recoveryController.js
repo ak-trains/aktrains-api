@@ -8,6 +8,7 @@ import CryptoJS from "crypto-js";
 
 const database = DB;
 const usersRef = database.ref("users");
+const historyRef = database.ref("history");
 
 const recoveryController = {
     async password(req,res,next){
@@ -37,6 +38,12 @@ const recoveryController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess());
 
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"password");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests());
+
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess());
 
             const match =  await bcrypt.compare(req.body.password,user.info.password);
@@ -64,6 +71,10 @@ const recoveryController = {
             document.signature = signature;
 
             await usersRef.child(user.uid).update(document);
+
+            const history = {snapshot:user.info,event:"password"};
+
+            await historyRef.child(user.uid).push().set(history);
 
             const response = {
                 status:201,
@@ -104,6 +115,12 @@ const recoveryController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess("FB1"));
 
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"sys-reset");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests());
+
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess("FB2"));
 
             let payload;
@@ -130,7 +147,7 @@ const recoveryController = {
 
             let currentSystem;
             
-            if(user.system.current==="N/A" && user.system.history==="N/A"){
+            if(user.system.details==="N/A"){
               
               newSystem.createdAt = timeStamp;
               newSystem.deletedAt = "N/A";
@@ -139,7 +156,7 @@ const recoveryController = {
               currentSystem = jks.sort(newSystem,true);
 
             }else{
-              const oldSystem = jks.sort(user.system.current,true);
+              const oldSystem = jks.sort(user.system.details,true);
 
               const oldSign = oldSystem.signature;
   
@@ -148,9 +165,6 @@ const recoveryController = {
               delete oldSystem.signature;
   
               const calOldSign = CryptoJS.SHA256(JSON.stringify(oldSystem)).toString();
-
-              console.log(calOldSign);
-              console.log(oldSign);
   
               if(calOldSign!==oldSign) return next(CustomErrorService.forbiddenAccess("FB4"));
 
@@ -162,9 +176,8 @@ const recoveryController = {
 
               currentSystem = jks.sort(newSystem,true);
             }
-
-            user.system.history = user.system.current;  
-            user.system.current = currentSystem;
+            
+            user.system.details = currentSystem;
             user.system.updatedAt = timeStamp;
 
             user.updatedAt = timeStamp;
@@ -179,6 +192,10 @@ const recoveryController = {
 
             await usersRef.child(user.uid).update(document);
 
+            const history = {snapshot:user.system,event:"system"};
+
+            await historyRef.child(user.uid).push().set(history);
+
             const response = {
                 status:201,
                 data:null,
@@ -187,10 +204,8 @@ const recoveryController = {
 
             return res.status(201).json(response);
 
-
-
         } catch (error) {
-            
+            return next(error);
         }
     }
 };
