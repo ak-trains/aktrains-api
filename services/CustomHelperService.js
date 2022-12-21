@@ -76,7 +76,14 @@ class CustomHelperSerice{
         let isAllowed;
 
         if(count.countOf!==currDate){
-            count.hits=0,
+            count.login=0;
+            count.logout=0;
+            count.challenge=0;
+            count.validate=0;
+            count.password=0;
+            count.sysReset=0;
+            count.sysCheck=0;
+            count.library=0;
             count.countOf=currDate,
             count.updatedAt=timeStamp
         };
