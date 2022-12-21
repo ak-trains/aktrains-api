@@ -58,7 +58,7 @@ const authController = {
 
             const onlinePayload = {uid:user.uid,email:user.email,isAuth:true};
 
-            const offlinePayload = {uid:user.uid};
+            const offlinePayload = {uid:user.uid,email:user.email,info:user.info,library:user.library};
 
             const onlineToken = CustomJwtService.signOnlineToken(onlinePayload);
             const offlineToken = CustomJwtService.signOfflineToken(offlinePayload);

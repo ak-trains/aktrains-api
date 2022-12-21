@@ -2,9 +2,9 @@ import express from "express";
 import {validator} from "../validators";
 import { rateLimit } from "express-rate-limit";
 import {authHandler} from "../middlewares"
-import {authController, recoveryController} from "../controllers";
+import {authController, recoveryController,userController} from "../controllers";
 
-const rtLimit = rateLimit({windowMs:60000,max:1});//1min,max:1
+const rtLimit = rateLimit({windowMs:60000,max:100});//1min,max:1
 
 const router = express.Router();
 
@@ -25,6 +25,6 @@ recoveryRouter.post("/password",validator.password(),recoveryController.password
 recoveryRouter.post("/system",validator.system(),recoveryController.system);//DONE
 
 userRouter.post("/library");
-userRouter.post("/system");
+userRouter.post("/system",validator.system(),userController.system);
 
 export default router;
