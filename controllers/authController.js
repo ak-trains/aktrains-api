@@ -10,6 +10,7 @@ import {CustomErrorService,CustomJwtService,CustomHelperSerice} from "../service
 import jks from "json-keys-sort";
 import otpGenerator from "otp-generator";
 import { validationResult } from "express-validator";
+import { BAD_CREDENTIALS, CHALLENGE_SENT, EMAIL_ALREADY_EXISTS, IN_ELIGIBLE_TO_SIGNUP, REGISTER_SUCCESS, UID_ALREADY_EXISTS, VERIFICATION_SUCCESS } from "../constants";
 
 const database = DB;
 const usersRef = database.ref("users");
@@ -56,9 +57,18 @@ const authController = {
 
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess());
 
-            const onlinePayload = {uid:user.uid,email:user.email,isAuth:true};
+            const onlinePayload = {
+                uid:user.uid,
+                email:user.email,
+                isAuth:true
+            };
 
-            const offlinePayload = {uid:user.uid,email:user.email,info:user.info,library:user.library};
+            const offlinePayload = {
+                uid:user.uid,
+                email:user.email,
+                info:user.info,
+                library:user.library
+            };
 
             const onlineToken = CustomJwtService.signOnlineToken(onlinePayload);
             const offlineToken = CustomJwtService.signOfflineToken(offlinePayload);
@@ -89,7 +99,20 @@ const authController = {
 
             const response = {
                 status:200,
-                data:{onlineToken,offlineToken},
+                data:{
+                    uid: user.uid, 
+                    email: user.email, 
+                    fname: user.info.fname, 
+                    lname: user.info.lname, 
+                    country: user.info.country, 
+                    secret: user.info.secret, 
+                    ipAddress: user.auth.ipAddress, 
+                    lastLoginAt: user.auth.lastLoginAt, 
+                    createdAt: user.createdAt, 
+                    updatedAt: user.updatedAt, 
+                    onlineToken: onlineToken, 
+                    offlineToken: offlineToken,
+                },
                 message:null,
             }
             
@@ -113,23 +136,23 @@ const authController = {
             
             const snapshot = await eligiblesRef.orderByChild("email").equalTo(req.body.email).get();
 
-            if (!snapshot.exists()) return next(CustomErrorService.resourceNotFound());
+            if (!snapshot.exists()) return next(CustomErrorService.resourceNotFound(IN_ELIGIBLE_TO_SIGNUP));
 
             const data = await snapshot.val();
 
             const eligible = data[req.body.secret];
 
-            if(eligible===undefined || eligible===null) return next(CustomErrorService.resourceNotFound());
+            if(eligible===undefined || eligible===null) return next(CustomErrorService.resourceNotFound(IN_ELIGIBLE_TO_SIGNUP));
             
             const snapshot1 = await usersRef.orderByChild("email").equalTo(req.body.email).get();
 
-            if(snapshot1.exists()) return next(CustomErrorService.conflictOccured());
+            if(snapshot1.exists()) return next(CustomErrorService.conflictOccured(EMAIL_ALREADY_EXISTS));
             
             const uuid = uuidv4();
 
             const snapshot2 = await usersRef.orderByChild("uid").equalTo(uuid).get();
 
-            if(snapshot2.exists()) return next(CustomErrorService.conflictOccured());
+            if(snapshot2.exists()) return next(CustomErrorService.conflictOccured(UID_ALREADY_EXISTS));
 
             const ip = requestIp.getClientIp(req);
 
@@ -221,6 +244,18 @@ const authController = {
                 text: CustomHelperSerice.generateMessage(uuid,req.body.email),
             };
 
+            
+            console.log(uuid,req.body.email);
+            await eligiblesRef.child(req.body.secret).remove();
+
+            const response = {
+                status:201,
+                data:null,
+                message:REGISTER_SUCCESS,
+            }
+
+            return res.status(201).json(response);
+
             transporter.sendMail(mailOptions, async (error)=>{
                 if (error) {
                     await usersRef.child(uuid).remove();
@@ -232,7 +267,7 @@ const authController = {
                 const response = {
                     status:201,
                     data:null,
-                    message:null,
+                    message:REGISTER_SUCCESS,
                 }
 
                 return res.status(201).json(response);
@@ -319,8 +354,19 @@ const authController = {
                 text: CustomHelperSerice.generateMessage2(payload),
             };
 
+            console.log(payload);
+
+            const response = {
+                status:201,
+                data:null,
+                message:CHALLENGE_SENT,
+            }
+
+            return res.status(201).json(response);
+
             transporter.sendMail(mailOptions, async (error)=>{
                 if (error) {
+                    console.log(error);
                     user.auth.challengeToken="N/A";
                     
                     delete user.signature;
@@ -339,7 +385,7 @@ const authController = {
                 const response = {
                     status:201,
                     data:null,
-                    message:null,
+                    message:CHALLENGE_SENT,
                 }
 
                 return res.status(201).json(response);
@@ -429,7 +475,7 @@ const authController = {
             const response = {
                 status:200,
                 data:{onlineToken},
-                message:null,
+                message:VERIFICATION_SUCCESS,
             }
             
             return res.status(200).json(response);

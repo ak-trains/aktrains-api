@@ -3,8 +3,11 @@ import {validator} from "../validators";
 import { rateLimit } from "express-rate-limit";
 import {authHandler} from "../middlewares"
 import {authController, recoveryController,userController} from "../controllers";
+import { CustomErrorService } from "../services";
 
-const rtLimit = rateLimit({windowMs:60000,max:100});//1min,max:1
+const rtLimit = rateLimit({windowMs:1000,max:1,handler:(req,res,next,opt)=>{
+    return next(CustomErrorService.tooManyRequests());
+}});//1min,max:1
 
 const router = express.Router();
 

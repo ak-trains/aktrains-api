@@ -137,7 +137,6 @@ const recoveryController = {
             const newSign = payload.signature;
 
             delete newSystem.createdAt;
-            delete newSystem.deletedAt;
 
             const calNewSign = CryptoJS.SHA256(JSON.stringify(newSystem)).toString();
 
@@ -150,7 +149,6 @@ const recoveryController = {
             if(user.system.details==="N/A"){
               
               newSystem.createdAt = timeStamp;
-              newSystem.deletedAt = "N/A";
               newSystem.signature = calNewSign;
 
               currentSystem = jks.sort(newSystem,true);
@@ -161,7 +159,6 @@ const recoveryController = {
               const oldSign = oldSystem.signature;
   
               delete oldSystem.createdAt;
-              delete oldSystem.deletedAt;
               delete oldSystem.signature;
   
               const calOldSign = CryptoJS.SHA256(JSON.stringify(oldSystem)).toString();
@@ -171,7 +168,6 @@ const recoveryController = {
               if(calNewSign===calOldSign) return next(CustomErrorService.conflictOccured());
 
               newSystem.createdAt = timeStamp;
-              newSystem.deletedAt = "N/A";
               newSystem.signature = calNewSign;
 
               currentSystem = jks.sort(newSystem,true);

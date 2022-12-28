@@ -10,22 +10,22 @@ const apiHandler = async (req,res,next)=>{
     if (!errors.isEmpty()) {
         const extractedErrors = [];
         errors.array().map(err=>extractedErrors.push({[err.param]:err.msg}));
-        return next(CustomErrorService.unProcessableEntity(extractedErrors));
+        return next(CustomErrorService.serverUnavailable("SU0"));
     }
 
-    
-    if(DEBUG_MODE===true) return next(CustomErrorService.serverUnavailable());
+    if(DEBUG_MODE===true) return next(CustomErrorService.serverUnavailable("SU1"));
 
-    if(MAINTAINANCE_MODE===true) return next(CustomErrorService.serverUnavailable());
+    if(MAINTAINANCE_MODE===true) return next(CustomErrorService.serverUnavailable("SU2"));
     
     const secret = req.headers.secret;
     const signature = req.headers.signature;
 
     const data = CustomHelperSerice.decrypt(secret);
-
+    
     const hash = CryptoJS.SHA256(data).toString();
+    
 
-    if(hash!==signature) return next(CustomErrorService.unAuthorizedAccess("Unknown Identity! Unauthorized access."));
+    if(hash!==signature) return next(CustomErrorService.serverUnavailable("SU3"));
 
     const {timeStamp,appId,appVer,apiKey} = JSON.parse(data);
 
@@ -34,13 +34,13 @@ const apiHandler = async (req,res,next)=>{
     
     var timeDiff = (ckDate.getTime() - ogDate.getTime()) / 1000;
 
-    if(timeDiff>1800000000000) return next(CustomErrorService.unAuthorizedAccess("Request expired! Unauthorized access."));
+    if(timeDiff>60) return next(CustomErrorService.serverUnavailable("SU4"));
 
-    if(apiKey!==CLIENT_APP_KEY) return next(CustomErrorService.unAuthorizedAccess("Unknown source! Unauthorized access."));
+    if(apiKey!==CLIENT_APP_KEY) return next(CustomErrorService.serverUnavailable("SU5"));
 
-    if(appId!==CLIENT_APP_ID) return next(CustomErrorService.serverUnavailable("Update available! Kindly update the client app."));
+    if(appId!==CLIENT_APP_ID) return next(CustomErrorService.serverUnavailable());
 
-    if(appVer!==CLIENT_APP_VER) return next(CustomErrorService.serverUnavailable("Update available! Kindly update the client app."));
+    if(appVer!==CLIENT_APP_VER) return next(CustomErrorService.serverUnavailable());
 
     return next();
 };

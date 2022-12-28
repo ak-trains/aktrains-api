@@ -1,7 +1,5 @@
 import CryptoJS from "crypto-js";
 import {CRYPT_KEY} from "../config";
-import { validationResult } from "express-validator";
-import {CustomErrorService} from "../services";
 import jks from "json-keys-sort";
 import moment from "moment";
 
@@ -62,6 +60,8 @@ class CustomHelperSerice{
         return `${confirmText}${baseText}${uidText}${usageText}${disclaimer}`;
     }
 
+  
+
     static checkSignature(document){ 
         const ogSignature = document.signature;
         delete document.signature;
@@ -92,7 +92,7 @@ class CustomHelperSerice{
         switch (event) {
 
             case "login":
-               isAllowed = (count.login>-1&&count.login<4);
+               isAllowed = (count.login>-1&&count.login<100);
                count.login = count.login+1;
             break;
 
@@ -102,8 +102,12 @@ class CustomHelperSerice{
             break; 
              
             case "challenge":
-                isAllowed = (count.challenge>-1&&count.challenge<4);
+                isAllowed = (count.challenge>-1&&count.challenge<100);
                 count.challenge = count.challenge+1;
+            break;
+            case "password":
+                isAllowed = (count.password>-1&&count.password<4);
+                count.password = count.password+1;
             break;
 
             case "validate":

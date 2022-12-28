@@ -7,7 +7,6 @@ import CryptoJS from "crypto-js";
 
 const database = DB;
 const usersRef = database.ref("users");
-const historyRef = database.ref("history");
 
 const userController = {
     async system(req,res,next){
@@ -54,21 +53,28 @@ const userController = {
                     
             const detectedSystem = jks.sort(payload.system,true);
             const detectedSign = payload.signature;
-
             delete detectedSystem.createdAt;
-            delete detectedSystem.deletedAt;
+          
 
             const calDetectedSign = CryptoJS.SHA256(JSON.stringify(detectedSystem)).toString();
 
             if(calDetectedSign!==detectedSign) return next(CustomErrorService.forbiddenAccess("FB3"));
 
-            if(user.system.details==="N/A") return next(CustomErrorService.forbiddenAccess("FB4"));
+            if(user.system.details==="N/A"){
+
+                const response = {
+                    status:200,
+                    data:{systemToken:null},
+                    message:"FB4",
+                }
+    
+                return res.status(201).json(response);
+            }
 
             const existingSystem = jks.sort(user.system.details,true);
             const existingSign = existingSystem.signature;
   
             delete existingSystem.createdAt;
-            delete existingSystem.deletedAt;
             delete existingSystem.signature;
 
             const calExistingSign = CryptoJS.SHA256(JSON.stringify(existingSystem)).toString();

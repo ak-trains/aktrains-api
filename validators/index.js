@@ -14,34 +14,34 @@ const validator = {
     },
     login(){
         return[
-            body("email").isEmail(),
-            body("password").isStrongPassword(),
-            body("uid").isUUID(),
+            body("email","Invalid email address.").isEmail(),
+            body("password","Invalid password. Required (minimum of 8 chars ,1 uppercase, 1 lowercase, 1 digit & 1 special char).").isStrongPassword(),
+            body("uid","Invalid user ID.").isUUID(),
         ];
     },
     register(){
         return [       
-            body("fname").isAlpha().isLength({min:1,max:15}),
-            body("lname").isAlpha().isLength({min:1,max:15}),
-            body("email").isEmail(),
-            body("password").isStrongPassword(),
-            body("country").isAlpha().isLength({min:4,max:56}),
-            body("secret").isAlphanumeric().isLength({min:20,max:20}),
+            body("fname","Invalid First name.").isAlpha().isLength({min:1,max:15}),
+            body("lname","Invalid Last name.").isAlpha().isLength({min:1,max:15}),
+            body("email","Invalid email address.").isEmail(),
+            body("password","Invalid password. Required (minimum of 8 chars ,1 uppercase, 1 lowercase, 1 digit & 1 special char).").isStrongPassword(),
+            body("country","Invalid country.").isAlpha().isLength({min:4,max:56}),
+            body("secret","Invalid registration key.").isAlphanumeric().isLength({min:20,max:20}),
         ];
     },
     challenge(){
         return [       
-            body("email").isEmail(),
-            body("uid").isUUID(),
-            body("type").isAlpha(['en-US']).isLength({min:6,max:6}),
+            body("email","Invalid email address.").isEmail(),
+            body("uid","Invalid user ID.").isUUID(),
+            body("type","Invalid challenge type.").isAlpha(['en-US']).isLength({min:6,max:6}),
         ];
     },
     validate(){
         return [       
-            body("email").isEmail(),
-            body("uid").isUUID(),
-            body("type").isAlpha(['en-US']).isLength({min:6,max:6}),
-            body("code").isAlphanumeric(['en-US']).isLength({min:8,max:8}),
+            body("email","Invalid email address.").isEmail(),
+            body("uid","Invalid user ID.").isUUID(),
+            body("type","Invalid challenge type.").isAlpha(['en-US']).isLength({min:6,max:6}),
+            body("code","Invalid verification code.").isAlphanumeric(['en-US']).isLength({min:8,max:8}),
             
         ];
     },
