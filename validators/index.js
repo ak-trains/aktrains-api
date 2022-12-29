@@ -54,6 +54,11 @@ const validator = {
         return [
             body("system").isJWT(),
         ]
+    },
+    logout(){
+        return [
+            body("library").isJWT(),
+        ]
     }
 }
 

@@ -23,6 +23,7 @@ authRouter.post("/login",validator.login(),authController.login);//DONE
 authRouter.post("/register",validator.register(),authController.register);//DONE          
 authRouter.post("/challenge",validator.challenge(),authController.challenge);//DONE
 authRouter.post("/validate",validator.validate(),authController.validate);//DONE
+authRouter.post("/logout",validator.logout(),authController.logout);//DONE
 
 recoveryRouter.post("/password",validator.password(),recoveryController.password);//DONE
 recoveryRouter.post("/system",validator.system(),recoveryController.system);//DONE

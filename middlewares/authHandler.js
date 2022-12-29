@@ -1,5 +1,5 @@
 import { validationResult } from "express-validator";
-import { BAD_AUTHORIZATION, INSUFFICIENT_PRIVILEGES } from "../constants";
+import { ACCESS_DENIED, BAD_AUTHORIZATION, INSUFFICIENT_PRIVILEGES, TAMPERED_DATA } from "../constants";
 import { CustomErrorService, CustomJwtService,CustomHelperSerice } from "../services";
 import { DB } from "../config";
 
@@ -14,7 +14,7 @@ const authHandler = {
         if (!errors.isEmpty()) {
             const extractedErrors = [];
             errors.array().map(err=>extractedErrors.push({[err.param]:err.msg}));
-            return next(CustomErrorService.unProcessableEntity(extractedErrors));
+            return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
         }
 
         const token = req.headers.authorization;
@@ -26,21 +26,21 @@ const authHandler = {
 
             const snapshot = await usersRef.orderByChild("email").equalTo(email).get();
             
-            if(!snapshot.exists()) return next(CustomErrorService.resourceNotFound());
+            if(!snapshot.exists()) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
             const data = await snapshot.val();
 
             const user = data[uid];
 
-            if(user===undefined || user===null) return next(CustomErrorService.resourceNotFound());
+            if(user===undefined || user===null) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
             const isTampered = CustomHelperSerice.checkSignature(user);
            
-            if(isTampered) return next(CustomErrorService.forbiddenAccess());
+            if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
-            if(user.auth.onlineToken===undefined || user.auth.onlineToken===null) return next(CustomErrorService.unAuthorizedAccess());
+            if(user.auth.onlineToken===undefined || user.auth.onlineToken===null) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
-            if(user.auth.onlineToken!==token) return next(CustomErrorService.unAuthorizedAccess());
+            if(user.auth.onlineToken!==token) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
             req.user = {uid,email,type};
 
@@ -56,7 +56,7 @@ const authHandler = {
         if (!errors.isEmpty()) {
             const extractedErrors = [];
             errors.array().map(err=>extractedErrors.push({[err.param]:err.msg}));
-            return next(CustomErrorService.unProcessableEntity(extractedErrors));
+            return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
         }
 
         const token = req.headers.authorization;
@@ -68,21 +68,21 @@ const authHandler = {
 
             const snapshot = await usersRef.orderByChild("email").equalTo(email).get();
             
-            if(!snapshot.exists()) return next(CustomErrorService.resourceNotFound());
+            if(!snapshot.exists()) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
             const data = await snapshot.val();
 
             const user = data[uid];
 
-            if(user===undefined || user===null) return next(CustomErrorService.resourceNotFound());
+            if(user===undefined || user===null) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
             const isTampered = CustomHelperSerice.checkSignature(user);
            
-            if(isTampered) return next(CustomErrorService.forbiddenAccess());
+            if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
-            if(user.auth.onlineToken===undefined || user.auth.onlineToken===null) return next(CustomErrorService.unAuthorizedAccess());
+            if(user.auth.onlineToken===undefined || user.auth.onlineToken===null) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
-            if(user.auth.onlineToken!==token) return next(CustomErrorService.unAuthorizedAccess());
+            if(user.auth.onlineToken!==token) return next(CustomErrorService.unAuthorizedAccess(ACCESS_DENIED));
 
             req.user = {uid,email};
 

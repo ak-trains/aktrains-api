@@ -1,7 +1,8 @@
-import {MAINTAINANCE_MODE,DEBUG_MODE,CLIENT_APP_KEY,CLIENT_APP_ID,CLIENT_APP_VER} from "../config";
+import {MAINTAINANCE_MODE,CLIENT_APP_KEY,CLIENT_APP_ID,CLIENT_APP_VER} from "../config";
 import {CustomErrorService,CustomHelperSerice} from "../services";
 import {validationResult} from "express-validator";
 import CryptoJS from "crypto-js";
+import { PROTECTED_RESOURCE, UNDER_MAINTAINANCE, UNSUPPORTED_CLIENT } from "../constants";
 
 const apiHandler = async (req,res,next)=>{
 
@@ -10,12 +11,10 @@ const apiHandler = async (req,res,next)=>{
     if (!errors.isEmpty()) {
         const extractedErrors = [];
         errors.array().map(err=>extractedErrors.push({[err.param]:err.msg}));
-        return next(CustomErrorService.serverUnavailable("SU0"));
+        return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
     }
 
-    if(DEBUG_MODE===true) return next(CustomErrorService.serverUnavailable("SU1"));
-
-    if(MAINTAINANCE_MODE===true) return next(CustomErrorService.serverUnavailable("SU2"));
+    if(MAINTAINANCE_MODE==="true") return next(CustomErrorService.serverUnavailable(UNDER_MAINTAINANCE));
     
     const secret = req.headers.secret;
     const signature = req.headers.signature;
@@ -25,7 +24,7 @@ const apiHandler = async (req,res,next)=>{
     const hash = CryptoJS.SHA256(data).toString();
     
 
-    if(hash!==signature) return next(CustomErrorService.serverUnavailable("SU3"));
+    if(hash!==signature) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
 
     const {timeStamp,appId,appVer,apiKey} = JSON.parse(data);
 
@@ -34,13 +33,13 @@ const apiHandler = async (req,res,next)=>{
     
     var timeDiff = (ckDate.getTime() - ogDate.getTime()) / 1000;
 
-    if(timeDiff>60) return next(CustomErrorService.serverUnavailable("SU4"));
+    if(timeDiff>60) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
 
-    if(apiKey!==CLIENT_APP_KEY) return next(CustomErrorService.serverUnavailable("SU5"));
+    if(apiKey!==CLIENT_APP_KEY) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
 
-    if(appId!==CLIENT_APP_ID) return next(CustomErrorService.serverUnavailable());
+    if(appId!==CLIENT_APP_ID) return next(CustomErrorService.serverUnavailable(UNSUPPORTED_CLIENT));
 
-    if(appVer!==CLIENT_APP_VER) return next(CustomErrorService.serverUnavailable());
+    if(appVer!==CLIENT_APP_VER) return next(CustomErrorService.serverUnavailable(UNSUPPORTED_CLIENT));
 
     return next();
 };

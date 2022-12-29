@@ -11,7 +11,7 @@ const errorHandler = (err, req, res, next) => {
         status:statusCode,
         data:null,
         message: errMsg,
-        ...(DEBUG_MODE === 'true' && { error: err.message }),
+        ...(DEBUG_MODE === "true" && { error: err.message }),
 
     }
     
