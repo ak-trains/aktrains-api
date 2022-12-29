@@ -28,7 +28,9 @@ authRouter.post("/logout",validator.logout(),authController.logout);//DONE
 recoveryRouter.post("/password",validator.password(),recoveryController.password);//DONE
 recoveryRouter.post("/system",validator.system(),recoveryController.system);//DONE
 
+userRouter.post("/system",validator.system(),userController.system);//DONE
+userRouter.post("/details",userController.details);//DONE
 userRouter.post("/library");
-userRouter.post("/system",validator.system(),userController.system);
+
 
 export default router;

@@ -189,7 +189,7 @@ const recoveryController = {
 
             await usersRef.child(user.uid).update(document);
 
-            const history = {event:"system",createdAt:timeStamp};
+            const history = {event:"system-reset",createdAt:timeStamp};
 
             await historyRef.child(user.uid).push().set(history);
 

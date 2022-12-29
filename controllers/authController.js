@@ -189,6 +189,7 @@ const authController = {
                 sysReset:0,
                 sysCheck:0,
                 library:0,
+                details:0,
                 countOf:timeStamp.substring(0,8),
                 updatedAt:timeStamp,
             }

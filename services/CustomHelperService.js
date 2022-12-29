@@ -84,6 +84,7 @@ class CustomHelperSerice{
             count.sysReset=0;
             count.sysCheck=0;
             count.library=0;
+            count.details=0;
             count.countOf=currDate,
             count.updatedAt=timeStamp
         };
@@ -128,6 +129,11 @@ class CustomHelperSerice{
             case "library":
                 isAllowed = (count.library>-1&&count.library<4);
                 count.library = count.library+1;
+            break; 
+
+            case "details":
+                isAllowed = (count.details>-1&&count.details<4);
+                count.details = count.details+1;
             break; 
         
             default:
