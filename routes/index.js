@@ -6,7 +6,7 @@ import {authController, recoveryController,userController} from "../controllers"
 import { CustomErrorService } from "../services";
 import { ATTEMPTS_EXPIRED } from "../constants";
 
-const rtLimit = rateLimit({windowMs:3600000,max:3,handler:(req,res,next,opt)=>{
+const rtLimit = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 

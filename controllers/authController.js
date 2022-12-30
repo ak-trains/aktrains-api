@@ -207,7 +207,6 @@ const authController = {
                 info:info,
                 auth:auth,
                 system:system,
-                library:library,
                 count:count,
                 createdAt:timeStamp,
                 updatedAt:timeStamp,
