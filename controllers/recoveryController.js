@@ -5,7 +5,7 @@ import moment from "moment";
 import jks from "json-keys-sort";
 import bcrypt from "bcrypt";
 import CryptoJS from "crypto-js";
-import { BAD_CHALLENGE_TYPE, BANNED_USER_ACCOUNT, PASSWORD_RESET_SUCCESS, SAME_PASSWORD, SAME_SYSTEM, SYSTEM_RESET_SUCCESS, TAMPERED_DATA, TAMPERED_SYSTEM, TOO_MANY_REQUESTS, USER_NOT_FOUND } from "../constants";
+import { BAD_CHALLENGE_TYPE, BANNED_USER_ACCOUNT, PASSWORD_RESET_SUCCESS, SAME_PASSWORD, SAME_SYSTEM, SYSTEM_RESET_SUCCESS, TAMPERED_DATA, TAMPERED_SYSTEM, QUOTA_EXPIRED, USER_NOT_FOUND } from "../constants";
 
 const database = DB;
 const usersRef = database.ref("users");
@@ -39,17 +39,17 @@ const recoveryController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"password");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
 
             const match =  await bcrypt.compare(req.body.password,user.info.password);
 
             if(match) return next(CustomErrorService.conflictOccured(SAME_PASSWORD));
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"password");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
 
             const pass = await bcrypt.hash(req.body.password,10);
 
@@ -116,12 +116,6 @@ const recoveryController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"sys-reset");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
 
             let payload;
@@ -173,6 +167,12 @@ const recoveryController = {
 
               currentSystem = jks.sort(newSystem,true);
             }
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"sys-reset");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
             
             user.system.details = currentSystem;
             user.system.updatedAt = timeStamp;

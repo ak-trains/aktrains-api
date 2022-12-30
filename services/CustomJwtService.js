@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 class CustomJwtService {
 
     static signOnlineToken(payload) {
-        return jwt.sign(payload, JWT_ONLINE_SECRET, { expiresIn: "180s" });
+        return jwt.sign(payload, JWT_ONLINE_SECRET, { expiresIn: "60s" });
     }
 
     static signOfflineToken(payload) {
@@ -12,11 +12,11 @@ class CustomJwtService {
     }
 
     static signChallengeToken(payload) {
-        return jwt.sign(payload, JWT_CHALLENGE_SECRET, { expiresIn: "300s" });
+        return jwt.sign(payload, JWT_CHALLENGE_SECRET, { expiresIn: "120s" });
     }
 
     static signSystemToken(payload) {
-        return jwt.sign(payload, JWT_SYSTEM_SECRET, { expiresIn: "1y" });
+        return jwt.sign(payload, JWT_SYSTEM_SECRET, { expiresIn: "60s" });
     }
 
     static verifyOnlineToken(token) {

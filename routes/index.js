@@ -4,10 +4,11 @@ import { rateLimit } from "express-rate-limit";
 import {authHandler} from "../middlewares"
 import {authController, recoveryController,userController} from "../controllers";
 import { CustomErrorService } from "../services";
+import { ATTEMPTS_EXPIRED } from "../constants";
 
-const rtLimit = rateLimit({windowMs:1000,max:1,handler:(req,res,next,opt)=>{
-    return next(CustomErrorService.tooManyRequests());
-}});//1min,max:1
+const rtLimit = rateLimit({windowMs:3600000,max:3,handler:(req,res,next,opt)=>{
+    return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
+}});
 
 const router = express.Router();
 
@@ -15,21 +16,20 @@ const authRouter = express.Router();
 const recoveryRouter = express.Router();
 const userRouter = express.Router();
 
-router.use("/auth",rtLimit,authRouter);
-router.use("/recovery",rtLimit,validator.userAuth(),authHandler.recovery,recoveryRouter);
-router.use("/user",rtLimit,validator.userAuth(),authHandler.legacy,userRouter);
+router.use("/api/client/auth",rtLimit,authRouter);
+router.use("/api/client/recovery",rtLimit,validator.userAuth(),authHandler.recovery,recoveryRouter);
+router.use("/api/client/user",rtLimit,validator.userAuth(),authHandler.legacy,userRouter);
 
-authRouter.post("/login",validator.login(),authController.login);//DONE                   
-authRouter.post("/register",validator.register(),authController.register);//DONE          
-authRouter.post("/challenge",validator.challenge(),authController.challenge);//DONE
-authRouter.post("/validate",validator.validate(),authController.validate);//DONE
-authRouter.post("/logout",validator.logout(),authController.logout);//DONE
+authRouter.post("/login",validator.login(),authController.login);                   
+authRouter.post("/register",validator.register(),authController.register);          
+authRouter.post("/challenge",validator.challenge(),authController.challenge);
+authRouter.post("/validate",validator.validate(),authController.validate);
 
-recoveryRouter.post("/password",validator.password(),recoveryController.password);//DONE
-recoveryRouter.post("/system",validator.system(),recoveryController.system);//DONE
+recoveryRouter.post("/password",validator.password(),recoveryController.password);
+recoveryRouter.post("/system",validator.system(),recoveryController.system);
 
-userRouter.post("/system",validator.system(),userController.system);//DONE
-userRouter.post("/details",userController.details);//DONE
+userRouter.post("/system",validator.system(),userController.system);
+userRouter.post("/details",userController.details);
 userRouter.post("/library");
 
 

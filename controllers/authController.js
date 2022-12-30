@@ -10,7 +10,7 @@ import {CustomErrorService,CustomJwtService,CustomHelperSerice} from "../service
 import jks from "json-keys-sort";
 import otpGenerator from "otp-generator";
 import { validationResult } from "express-validator";
-import { ALREADY_LOGGED_IN, BAD_CHALLENGE_TYPE, BAD_CREDENTIALS, BANNED_USER_ACCOUNT, CHALLENGE_EXPIRED, CHALLENGE_SENT, EMAIL_ALREADY_EXISTS, IN_ELIGIBLE_TO_SIGNUP, LOGIN_SUCCESS, LOGOUT_SUCCESS, REGISTER_SUCCESS, TAMPERED_DATA, TAMPERED_LIBRARY, TOO_MANY_REQUESTS, UID_ALREADY_EXISTS, USER_NOT_FOUND, VERIFICATION_SUCCESS } from "../constants";
+import { ALREADY_CHALLENGED, ALREADY_LOGGED_IN, BAD_CHALLENGE_TYPE, BAD_CREDENTIALS, BANNED_USER_ACCOUNT, CHALLENGE_EXPIRED, CHALLENGE_SENT, EMAIL_ALREADY_EXISTS, IN_ELIGIBLE_TO_SIGNUP, LOGIN_SUCCESS, LOGOUT_SUCCESS, REGISTER_SUCCESS, TAMPERED_DATA, QUOTA_EXPIRED, UID_ALREADY_EXISTS, USER_NOT_FOUND, VERIFICATION_SUCCESS } from "../constants";
 
 const database = DB;
 const usersRef = database.ref("users");
@@ -44,12 +44,6 @@ const authController = {
             const isTampered = CustomHelperSerice.checkSignature(user);
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
-            
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"login");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
 
             const match = await bcrypt.compare(req.body.password,user.info.password);
 
@@ -61,11 +55,17 @@ const authController = {
                 try {
                    const payload =  CustomJwtService.verifyOnlineToken(user.auth.onlineToken);
                    if (payload.isAuth) return next(CustomErrorService.conflictOccured(ALREADY_LOGGED_IN));
-                    
+                   
                  } catch (error) {
                     if (error.name!=="TokenExpiredError") return next(CustomErrorService.conflictOccured(ALREADY_LOGGED_IN));
                  }
             }
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"login");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
             
             const onlinePayload = {
                 uid:user.uid,
@@ -73,7 +73,21 @@ const authController = {
                 isAuth:true
             };
 
+            const offlinePayload = {
+                uid:user.uid,
+                email:user.email,
+                name:`${user.info.fname} ${user.info.lname}`,
+                isBanned:user.info.isBanned,
+                password:user.info.password,
+                secret:user.info.secret,
+                lastLoginAt:user.auth.lastLoginAt,
+                signature: user.system.signature,
+                createdAt:user.createdAt,
+                updatedAt:user.updatedAt,
+            };
+
             const onlineToken = CustomJwtService.signOnlineToken(onlinePayload);
+            const offlineToken = CustomJwtService.signOfflineToken(offlinePayload);
 
             const timeStamp = moment(new Date()).format("YYYYMMDDTHHmmss");
 
@@ -99,7 +113,7 @@ const authController = {
 
             const response = {
                 status:200,
-                data:{onlineToken},
+                data:{onlineToken,offlineToken},
                 message:LOGIN_SUCCESS,
             }
             
@@ -165,8 +179,7 @@ const authController = {
                 onlineToken:"N/A",
                 challengeToken:"N/A",
                 ipAddress:ip,
-                lastLoginAt:"N/A", 
-                lastLogoutAt:"N/A",         
+                lastLoginAt:"N/A",
                 updatedAt:timeStamp,
             };
 
@@ -175,14 +188,8 @@ const authController = {
                 updatedAt:timeStamp,
             };
 
-            const library={
-                addons:"N/A",          
-                updatedAt:timeStamp,
-            }
-
             const count={
                 login:0,
-                logout:0,
                 challenge:0,
                 validate:0,
                 password:0,
@@ -294,12 +301,6 @@ const authController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"challenge");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
 
             if (user.auth.onlineToken!=="N/A") {
@@ -310,7 +311,22 @@ const authController = {
                     if (error.name!=="TokenExpiredError") return next(CustomErrorService.conflictOccured(ALREADY_LOGGED_IN));
                  }
             }
+
+            if (user.auth.challengeToken!=="N/A") {
+                try {
+                    CustomJwtService.verifyChallengeToken(user.auth.challengeToken);
+                    return next(CustomErrorService.conflictOccured(ALREADY_CHALLENGED));
+                 } catch (error) {
+                    if (error.name!=="TokenExpiredError") return next(CustomErrorService.conflictOccured(ALREADY_CHALLENGED));
+                 }
+            }
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"challenge");
             
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
+
             const code = otpGenerator.generate(8,{upperCaseAlphabets:true,lowerCaseAlphabets:false,specialChars:false,digits:true});
             
             const payload = {challenge:code,reason:req.body.type,uid:user.uid,email:user.email};
@@ -419,12 +435,6 @@ const authController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"validate");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
 
             if (user.auth.onlineToken!=="N/A") {
@@ -456,6 +466,13 @@ const authController = {
             if(payload.email!==req.body.email) return next(CustomErrorService.unAuthorizedAccess(BAD_CREDENTIALS));
             if(payload.reason!==req.body.type) return next(CustomErrorService.unAuthorizedAccess(BAD_CREDENTIALS));
             if(req.body.code!==payload.challenge) return next(CustomErrorService.unAuthorizedAccess(BAD_CREDENTIALS));
+
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"validate");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
 
             const onlinePayload = {uid:user.uid,email:user.email,isAuth:false,type:payload.reason};
 
@@ -493,120 +510,7 @@ const authController = {
         } catch (error) {
             return next(error);
         }
-    },
-    async logout (req,res,next){
-        
-        const errors = validationResult(req);
-                
-        if (!errors.isEmpty()) {
-            const extractedErrors = [];
-            errors.array().map(err=>extractedErrors.push({[err.param]:err.msg}));
-            return next(CustomErrorService.unProcessableEntity(extractedErrors));
-        }
-
-        try {
-
-            const snapshot = await usersRef.orderByChild("email").equalTo(req.body.email).get();
-            
-            if(!snapshot.exists()) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
-
-            const data = await snapshot.val();
-
-            const user = data[req.body.uid];
-
-            if(user===undefined || user===null) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
-
-            const isTampered = CustomHelperSerice.checkSignature(user);
-           
-            if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
-            
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"logout");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-
-            const match = await bcrypt.compare(req.body.password,user.info.password);
-
-            if(!match) return next(CustomErrorService.unAuthorizedAccess(BAD_CREDENTIALS));
-
-            if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
-
-            let payload;
-
-            try {
-               payload = CustomJwtService.verifySystemToken(req.body.library);
-            } catch (error) {
-              return next(CustomErrorService.conflictOccured(TAMPERED_LIBRARY));
-            }
-
-            if (payload.library===undefined || payload.library===null) return next(CustomErrorService.resourceNotFound(TAMPERED_LIBRARY));
-            
-            
-            if (user.library.addons!=="N/A" && payload.library!=="N/A") {
-                try {
-                    for (const addon in user.library.addons) {
-                        payload.library[addon];
-                    }
-                } catch (error) {
-                    return next(CustomErrorService.resourceNotFound(TAMPERED_LIBRARY));
-                }
-            }else{
-                return next(CustomErrorService.resourceNotFound(TAMPERED_LIBRARY));
-            }
-            
-            const offlinePayload = {
-                uid:user.uid,
-                email:user.email,
-                name:`${user.info.fname} ${user.info.lname}`,
-                isBanned:user.info.isBanned,
-                password:user.info.password,
-                secret:user.info.secret,
-                lastLoginAt:user.auth.lastLoginAt,
-                lastLogoutAt: user.auth.lastLogoutAt,
-                signature: user.system.signature,
-                createdAt:user.createdAt,
-                updatedAt:user.updatedAt,
-            };
-
-            const offlineToken = CustomJwtService.signOfflineToken(offlinePayload);
-
-            const timeStamp = moment(new Date()).format("YYYYMMDDTHHmmss");
-            
-            user.auth.onlineToken="N/A";
-            user.auth.lastLogoutAt=timeStamp;
-            user.auth.updatedAt=timeStamp;
-
-            user.library.addons = payload.library;
-            user.library.updatedAt = timeStamp;
-            user.updatedAt = timeStamp;
-
-            delete user.signature;
-
-            const document = jks.sort(user,true);
-
-            const signature = CryptoJS.SHA256(JSON.stringify(document)).toString();
-
-            document.signature = signature;
-
-            await usersRef.child(user.uid).update(document);
-
-            const history = {event:"logout",createdAt:timeStamp};
-
-            await historyRef.child(user.uid).push().set(history);
-
-            const response = {
-                status:200,
-                data:{offlineToken},
-                message:LOGOUT_SUCCESS,
-            }
-            
-            return res.status(200).json(response);
-
-        } catch (error) {
-            return next(error);
-        }
-    }, 
+    }
 }
 
 export default authController;

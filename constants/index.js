@@ -6,7 +6,9 @@ const INSUFFICIENT_PRIVILEGES = "You do not have the level of access to perform 
 const TAMPERED_DATA = "Failed to validate your account. Your account contains information which fails to validate its integrity.";
 const BAD_AUTHORIZATION = "Authorization provided is either expired or has failed to verify it's identity. Please try again with valid authorization.";
 const USER_NOT_FOUND = "A user with AKTrains account for the provided user ID and email address could not be found. Try again with valid credentials.";
-const TOO_MANY_REQUESTS = "We limit how often you can perform or do certian actions on AKTrains to protect our systems. You can try again later.";
+const QUOTA_EXPIRED = "We limit how often you can perform or do certian actions on AKTrains to protect our systems. You can try again later.";
+const TOO_MANY_REQUESTS = "We are sorry, but you have sent too many requests to us recently. Please try again later. That's all we can say.";
+const ATTEMPTS_EXPIRED = "You reached maximum number of attempts to perform this action and hence being blocked temporarliy from performing this action. Try again after some time.";
 const BAD_CREDENTIALS = "Credentials provided by you are invalid. Please check your credentials correctly and try again.";
 const BANNED_USER_ACCOUNT = "You are banned from AKTrains because you have violated our terms of service. If you think it's a mistake, contact AKTrains.";
 const ALREADY_LOGGED_IN = "You are already logged in elsewhere. You can only be logged in on one system at a time. Log out from other system and try again.";
@@ -17,9 +19,10 @@ const BAD_CHALLENGE_TYPE = "Since provided challenge type in invalid, therefore 
 const CHALLENGE_EXPIRED = "Verification code provided by you is expired. Please generate a new verification code and try again.";
 const SAME_PASSWORD = "Your new password cannot be the same as your old password. Try again with a different password.";
 const TAMPERED_SYSTEM = "Failed to validate your system. Your system information fails to validate its integrity.";
-const TAMPERED_LIBRARY = "Failed to validate your library. Your library information fails to validate its integrity.";
+const ALREADY_CHALLENGED = "You have already requested for a verification code which is not yet used by you. Either wait for it to expire or use it.";
 const SAME_SYSTEM = "Your new system cannot be the same as your old system. Try again if with a different system.";
 const NEW_SYSTEM_DETECTED = "Account login on an unrecognized device is detected. You can only use app on one system at a time. Either use app on recognized system or get new system registered.";
+const INTERNAL_SERVER_ERROR = "The server encountered an error and could not complete your request. If problem persists, then please contact AKTrains.";
 const LOGIN_SUCCESS= "Well done, you have logged in successfully.";
 const REGISTER_SUCCESS = "Welcome to AKTrains! Your account has been successfully created. Please check your inbox, a email including your account details has been sent to registered email address.";
 const CHALLENGE_SENT = "An email containing eight-digit one time verification code has been sent to your registered email address.";
@@ -37,7 +40,9 @@ export {
     TAMPERED_DATA,
     BAD_AUTHORIZATION,
     USER_NOT_FOUND,
+    QUOTA_EXPIRED,
     TOO_MANY_REQUESTS,
+    ATTEMPTS_EXPIRED,
     BAD_CREDENTIALS,
     BANNED_USER_ACCOUNT,
     ALREADY_LOGGED_IN,
@@ -48,12 +53,13 @@ export {
     CHALLENGE_EXPIRED,
     SAME_PASSWORD,
     TAMPERED_SYSTEM,
-    TAMPERED_LIBRARY,
+    ALREADY_CHALLENGED,
     SAME_SYSTEM,
     NEW_SYSTEM_DETECTED,
     LOGIN_SUCCESS,
     REGISTER_SUCCESS,
     CHALLENGE_SENT,
+    INTERNAL_SERVER_ERROR,
     VERIFICATION_SUCCESS,
     PASSWORD_RESET_SUCCESS,
     SYSTEM_RESET_SUCCESS,

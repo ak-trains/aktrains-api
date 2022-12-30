@@ -1,11 +1,12 @@
 import {DEBUG_MODE} from "../config";
+import { INTERNAL_SERVER_ERROR } from "../constants";
 import {CustomErrorService} from "../services";
 
 const errorHandler = (err, req, res, next) => {
 
     let statusCode = 500;
     
-    let errMsg = "Internal server error.";
+    let errMsg = INTERNAL_SERVER_ERROR;
 
     let response = {
         status:statusCode,

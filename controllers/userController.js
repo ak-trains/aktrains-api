@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import {DB} from "../config";
 import { CustomErrorService,CustomHelperSerice, CustomJwtService } from "../services";
-import { BANNED_USER_ACCOUNT, NEW_SYSTEM_DETECTED, TAMPERED_DATA, TAMPERED_SYSTEM, TOO_MANY_REQUESTS, USER_NOT_FOUND } from "../constants";
+import { BANNED_USER_ACCOUNT, NEW_SYSTEM_DETECTED, TAMPERED_DATA, TAMPERED_SYSTEM, QUOTA_EXPIRED, USER_NOT_FOUND } from "../constants";
 import jks from "json-keys-sort";
 import CryptoJS from "crypto-js";
 import moment from "moment";
@@ -36,12 +36,6 @@ const userController = {
             const isTampered = CustomHelperSerice.checkSignature(user);
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
-
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"sys-check");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
 
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
 
@@ -84,6 +78,12 @@ const userController = {
                     isNewSystem=true;
                 }
             }
+
+            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"sys-check");
+            
+            user.count = newCount;
+
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
 
             if (isNewSystem) {
 
@@ -160,13 +160,13 @@ const userController = {
            
             if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
 
+            if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
+
             const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"details");
             
             user.count = newCount;
 
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-
-            if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
 
             const info = {
                 uid:user.uid,
@@ -223,7 +223,7 @@ const userController = {
             
             user.count = newCount;
 
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
+            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
 
             if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
 

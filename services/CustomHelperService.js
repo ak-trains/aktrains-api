@@ -96,11 +96,6 @@ class CustomHelperSerice{
                isAllowed = (count.login>-1&&count.login<100);
                count.login = count.login+1;
             break;
-
-            case "logout":
-                isAllowed = (count.logout>-1&&count.logout<4);
-                count.logout = count.logout+1;
-            break; 
              
             case "challenge":
                 isAllowed = (count.challenge>-1&&count.challenge<100);
