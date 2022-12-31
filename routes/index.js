@@ -12,6 +12,8 @@ const rtLimit = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
 
 const router = express.Router();
 
+router.get("/library",userController.library);
+
 const authRouter = express.Router();
 const recoveryRouter = express.Router();
 const userRouter = express.Router();
@@ -30,7 +32,7 @@ recoveryRouter.post("/system",validator.system(),recoveryController.system);
 
 userRouter.post("/system",validator.system(),userController.system);
 userRouter.post("/details",userController.details);
-userRouter.post("/library");
+userRouter.post("/library",userController.library);
 
 
 export default router;

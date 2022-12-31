@@ -102,32 +102,32 @@ class CustomHelperSerice{
                 count.challenge = count.challenge+1;
             break;
             case "password":
-                isAllowed = (count.password>-1&&count.password<4);
+                isAllowed = (count.password>-1&&count.password<100);
                 count.password = count.password+1;
             break;
 
             case "validate":
-                isAllowed = (count.validate>-1&&count.validate<4);
+                isAllowed = (count.validate>-1&&count.validate<100);
                 count.validate = count.validate+1;
             break; 
 
             case "sys-reset":
-                isAllowed = (count.sysReset>-1&&count.sysReset<4);
+                isAllowed = (count.sysReset>-1&&count.sysReset<100);
                 count.sysReset = count.sysReset+1;
             break; 
 
             case "sys-check":
-                isAllowed = (count.sysCheck>-1&&count.sysCheck<4);
+                isAllowed = (count.sysCheck>-1&&count.sysCheck<100);
                 count.sysCheck = count.sysCheck+1;
             break; 
 
             case "library":
-                isAllowed = (count.library>-1&&count.library<4);
+                isAllowed = (count.library>-1&&count.library<100);
                 count.library = count.library+1;
             break; 
 
             case "details":
-                isAllowed = (count.details>-1&&count.details<4);
+                isAllowed = (count.details>-1&&count.details<100);
                 count.details = count.details+1;
             break; 
         

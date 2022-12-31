@@ -11,6 +11,7 @@ const usersRef = database.ref("users");
 const historyRef = database.ref("history");
 const addonsRef = database.ref("addons");
 const patchesRef = database.ref("patches");
+const libraryRef = database.ref("library");
 
 const userController = {
     async system(req,res,next){
@@ -150,11 +151,13 @@ const userController = {
 
             if(user===undefined || user===null) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
 
-            const snapshot1 = await historyRef.child(req.user.uid).orderByChild("createdAt").equalTo(req.user.email).get();
+            const snapshot1 = await historyRef.child(req.user.uid).orderByChild("createdAt").limitToFirst(10).get();
             
             if(!snapshot1.exists()) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
 
             const data1 = await snapshot1.val();
+
+          
 
             const isTampered = CustomHelperSerice.checkSignature(user);
            
@@ -168,6 +171,12 @@ const userController = {
 
             if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
 
+              const history = [];
+
+              for (const d in data1){
+                history.push(data1[d]);
+              }
+
             const info = {
                 uid:user.uid,
                 email:user.email,
@@ -177,7 +186,7 @@ const userController = {
                 ipAddress:user.auth.ipAddress,
                 lastLoginAt:user.auth.lastLoginAt,
                 lastLogoutAt:user.auth.lastLogoutAt,
-                history:data1,
+                history:history,
             };
 
             const token = CustomJwtService.signSystemToken({info:info});
@@ -205,54 +214,46 @@ const userController = {
         }
 
         try {
-            const snapshot = await usersRef.orderByChild("email").equalTo(req.user.email).get();
+
+            const addons = [];
+
+            const patches = [];
             
-            if(!snapshot.exists()) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
+            const snapshot = await addonsRef.child("xindex").get();
 
-            const data = await snapshot.val();
+            const indexes = await snapshot.val();
 
-            const user = data[req.user.uid];
+            for (const index in indexes){
 
-            if(user===undefined || user===null) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
+                const snapshot = await libraryRef.child(indexes[index]).child("d2cc8050-e430-433a-9d5c-7b1e0022ab7c").get();
 
-            const isTampered = CustomHelperSerice.checkSignature(user);
-           
-            if(isTampered) return next(CustomErrorService.forbiddenAccess(TAMPERED_DATA));
-
-            const {isAllowed,newCount} = CustomHelperSerice.checkRateLimit(user.count,"library");
-            
-            user.count = newCount;
-
-            if(!isAllowed) return next(CustomErrorService.tooManyRequests(QUOTA_EXPIRED));
-
-            if(user.info.isBanned) return next(CustomErrorService.forbiddenAccess(BANNED_USER_ACCOUNT));
-
-            const snapshot1 = await addonsRef.get();
-
-            const addons = snapshot1.data();
+                if (!snapshot.exists()) {
+                    delete indexes[index];
+                }
+            }
 
 
-            const library = [];
+            for (const index in indexes){
 
-        
-            const info = {
-                uid:user.uid,
-                email:user.email,
-                country:user.info.country,
-                name:`${user.info.fname} ${user.info.lname}`,
-                secret:user.info.secret,
-                ipAddress:user.auth.ipAddress,
-                lastLoginAt:user.auth.lastLoginAt,
-                lastLogoutAt:user.auth.lastLogoutAt,
-                history:data1,
-            };
+                const snapshot = await addonsRef.child(indexes[index]).get();
+                const snapshot1 = await patchesRef.child(indexes[index]).get();
 
-            const token = CustomJwtService.signSystemToken({info:info});
+               if (snapshot.exists()) {
+                const addon = await snapshot.val();
+                addons.push(addon);
+               }
 
+               if (snapshot1.exists()) {
+                const patch = await snapshot1.val();
+                patches.push(patch);
+               }    
+            }
+
+            const token = CustomJwtService.signSystemToken({addons,patches});
 
             const response = {
                 status:200,
-                data:{infoToken:token},
+                data:{libraryToken:token},
                 message:null,
             }
 

@@ -17,7 +17,9 @@ const rtLimit = rateLimit({windowMs:1000,max:1,handler:(req,res,next,opt)=>{
   return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
 }});
 
-app.use("/",rtLimit,validator.apiAuth(),apiHandler,routes);
+//app.use("/",rtLimit,validator.apiAuth(),apiHandler,routes);
+
+app.use("/",routes);
 
 app.use(errorHandler);
 
