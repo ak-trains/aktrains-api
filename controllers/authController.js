@@ -238,17 +238,6 @@ const authController = {
                 text: CustomHelperSerice.generateMessage(uuid,req.body.email),
             };
 
-            
-            console.log(uuid,req.body.email);
-            await eligiblesRef.child(req.body.secret).remove();
-
-            const response = {
-                status:201,
-                data:null,
-                message:REGISTER_SUCCESS,
-            }
-
-            return res.status(201).json(response);
 
             transporter.sendMail(mailOptions, async (error)=>{
                 if (error) {
@@ -365,16 +354,6 @@ const authController = {
                 subject: "Your AKTrains Verification Code",
                 text: CustomHelperSerice.generateMessage2(payload),
             };
-
-            console.log(payload);
-
-            const response = {
-                status:201,
-                data:null,
-                message:CHALLENGE_SENT,
-            }
-
-            return res.status(201).json(response);
 
             transporter.sendMail(mailOptions, async (error)=>{
                 if (error) {

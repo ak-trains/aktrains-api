@@ -151,7 +151,7 @@ const userController = {
 
             if(user===undefined || user===null) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
 
-            const snapshot1 = await historyRef.child(req.user.uid).orderByChild("createdAt").limitToFirst(10).get();
+            const snapshot1 = await historyRef.child(req.user.uid).orderByChild("createdAt").limitToLast(50).get();
             
             if(!snapshot1.exists()) return next(CustomErrorService.resourceNotFound(USER_NOT_FOUND));
 
@@ -225,7 +225,7 @@ const userController = {
 
             for (const index in indexes){
 
-                const snapshot = await libraryRef.child(indexes[index]).child("d2cc8050-e430-433a-9d5c-7b1e0022ab7c").get();
+                const snapshot = await libraryRef.child(indexes[index]).child(req.user.uid).get();
 
                 if (!snapshot.exists()) {
                     delete indexes[index];
