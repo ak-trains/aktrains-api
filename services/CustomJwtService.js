@@ -12,11 +12,11 @@ class CustomJwtService {
     }
 
     static signChallengeToken(payload) {
-        return jwt.sign(payload, JWT_CHALLENGE_SECRET, { expiresIn: "120s" });
+        return jwt.sign(payload, JWT_CHALLENGE_SECRET, { expiresIn: "240s" });
     }
 
     static signSystemToken(payload) {
-        return jwt.sign(payload, JWT_SYSTEM_SECRET, { expiresIn: "60s" });
+        return jwt.sign(payload, JWT_SYSTEM_SECRET, { expiresIn: "120s" });
     }
 
     static verifyOnlineToken(token) {

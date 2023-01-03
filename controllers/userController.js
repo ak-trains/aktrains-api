@@ -240,12 +240,63 @@ const userController = {
 
                if (snapshot.exists()) {
                 const addon = await snapshot.val();
-                addons.push(addon);
+               
+                addons.push({
+                    aid:addon.aid,
+                    isAddon:true,
+                    info:{
+                        name:addon.info.name,
+                        type:addon.info.atype,
+                        stype:addon.info.stype,
+                        creator:addon.info.creator,
+                        category:addon.category,
+                        summary:addon.info.summary,
+                        price:addon.info.price,
+                        shop:addon.info.shop,
+                        image:addon.info.image,
+                    },
+                    asset:{
+                        name:addon.file.name,
+                        secret:addon.file.secret,
+                        size:addon.file.size,
+                        version:addon.file.version,
+                    },
+                    paths:{
+                        dir:addon.paths.dirs,
+                        crypt:addon.paths.crypt,
+                        uninstall:addon.paths.uninstall,
+                    },
+                    createdAt:addon.createdAt,
+                    updatedAt:addon.file.updatedAt,
+                });
                }
 
                if (snapshot1.exists()) {
                 const patch = await snapshot1.val();
-                patches.push(patch);
+               
+                patches.push({
+                    aid:patch.aid,
+                    pid:patch.pid,
+                    isAddon:false,
+                    info:{
+                        name:patch.info.name,
+                        type:patch.info.atype,
+                        stype:patch.info.stype,
+                        creator:patch.info.creator,
+                       
+                        summary:patch.info.summary,
+                      
+                        image:patch.info.image,
+                    },
+                    asset:{
+                        name:patch.file.name,
+                       
+                        size:patch.file.size,
+                        version:patch.file.version,
+                    },
+                    createdAt:patch.createdAt,
+                    updatedAt:patch.file.updatedAt,
+                });
                }    
             }
 
