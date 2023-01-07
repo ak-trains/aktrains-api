@@ -81,9 +81,7 @@ const authController = {
                 password:user.info.password,
                 secret:user.info.secret,
                 lastLoginAt:user.auth.lastLoginAt,
-                signature: user.system.signature,
-                createdAt:user.createdAt,
-                updatedAt:user.updatedAt,
+                signature: user.system.details.signature,
             };
 
             const onlineToken = CustomJwtService.signOnlineToken(onlinePayload);
