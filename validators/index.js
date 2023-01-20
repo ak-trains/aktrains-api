@@ -26,7 +26,7 @@ const validator = {
             body("email","Invalid email address.").isEmail(),
             body("password","Invalid password. Required (minimum of 8 chars ,1 uppercase, 1 lowercase, 1 digit & 1 special char).").isStrongPassword(),
             body("country","Invalid country.").isAlpha().isLength({min:4,max:56}),
-            body("secret","Invalid registration key.").isAlphanumeric().isLength({min:20,max:20}),
+            body("secret","Invalid registration key.").isString().isLength({min:20,max:20}),
         ];
     },
     challenge(){

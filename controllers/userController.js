@@ -225,7 +225,7 @@ const userController = {
 
             for (const index in indexes){
 
-                const snapshot = await libraryRef.child(indexes[index]).child(req.user.uid).get();
+                const snapshot = await libraryRef.child(index).child(req.user.uid).get();
 
                 if (!snapshot.exists()) {
                     delete indexes[index];
@@ -235,8 +235,8 @@ const userController = {
 
             for (const index in indexes){
 
-                const snapshot = await addonsRef.child(indexes[index]).get();
-                const snapshot1 = await patchesRef.child(indexes[index]).get();
+                const snapshot = await addonsRef.child(index).get();
+                const snapshot1 = await patchesRef.child(index).get();
 
                if (snapshot.exists()) {
                 const addon = await snapshot.val();

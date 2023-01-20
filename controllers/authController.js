@@ -132,7 +132,7 @@ const authController = {
         }
 
         try {
-            
+           
             const snapshot = await eligiblesRef.orderByChild("email").equalTo(req.body.email).get();
 
             if (!snapshot.exists()) return next(CustomErrorService.resourceNotFound(IN_ELIGIBLE_TO_SIGNUP));
