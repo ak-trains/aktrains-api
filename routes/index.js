@@ -5,6 +5,7 @@ import {authHandler} from "../middlewares"
 import {authController, recoveryController,userController} from "../controllers";
 import { CustomErrorService } from "../services";
 import { ATTEMPTS_EXPIRED } from "../constants";
+import { MAXREQ, WIDTIME } from "../config";
 
 
 
@@ -22,19 +23,19 @@ router.use("/api/client/auth",authRouter);
 router.use("/api/client/recovery",validator.userAuth(),authHandler.recovery,recoveryRouter);
 router.use("/api/client/user",validator.userAuth(),authHandler.legacy,userRouter);
 
-const lgRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const lgRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
-const rgRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const rgRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
-const chRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const chRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
-const vlRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const vlRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
@@ -43,25 +44,25 @@ authRouter.post("/register",rgRtLm,validator.register(),authController.register)
 authRouter.post("/challenge",chRtLm,validator.challenge(),authController.challenge);
 authRouter.post("/validate",vlRtLm,validator.validate(),authController.validate);
 
-const srRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const srRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
-const prRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const prRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 recoveryRouter.post("/password",srRtLm,validator.password(),recoveryController.password);
 recoveryRouter.post("/system",prRtLm,validator.system(),recoveryController.system);
 
-const syRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const syRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
-const dtRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const dtRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 
-const lbRtLm = rateLimit({windowMs:3600000,max:6,handler:(req,res,next,opt)=>{
+const lbRtLm = rateLimit({windowMs:WIDTIME,max:MAXREQ,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(ATTEMPTS_EXPIRED));
 }});
 

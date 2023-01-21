@@ -17,22 +17,6 @@ class CustomHelperSerice{
         return cipherText;
     }
 
-    static genApiAuthHead(){
-        const data = {
-            "timeStamp":"2022-11-28T15:04:00",
-            "appId":"313052db-33f2-4797-b983-01a056b097cd",
-            "appVer":"6.0",
-            "apiKey":"e0fb071814d805277350f4f2c421dc1d95fa6cf036fdc65f849a7eca04e61712"
-        };
-
-        const result = this.encrypt(data);
-
-        const hash = CryptoJS.SHA256(JSON.stringify(data)).toString();
-
-        console.log(result);
-        console.log(hash);
-    }
-
     static generateMessage = (uid,email) =>{
         const confirmText = "This is the confirmation that your AKTrains account has been successfully created.\n\n";
         const baseText = "Welcome to AKTrains, this email includes your account details, so please keep it safe!\n\n";

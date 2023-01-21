@@ -41,4 +41,6 @@ export const {
     CLIENT_APP_ID,
     CLIENT_APP_VER,
     CRYPT_KEY,
+    WIDTIME,
+    MAXREQ
 } = process.env;

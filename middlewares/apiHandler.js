@@ -30,10 +30,9 @@ const apiHandler = async (req,res,next)=>{
 
     var ogDate = new Date(Date.parse(timeStamp)); 
     var ckDate   = new Date();
-    
     var timeDiff = (ckDate.getTime() - ogDate.getTime()) / 1000;
 
-    if(timeDiff>60) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
+    if(timeDiff>30) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
 
     if(apiKey!==CLIENT_APP_KEY) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
 

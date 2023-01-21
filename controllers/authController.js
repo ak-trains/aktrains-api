@@ -355,7 +355,6 @@ const authController = {
 
             transporter.sendMail(mailOptions, async (error)=>{
                 if (error) {
-                    console.log(error);
                     user.auth.challengeToken="N/A";
                     
                     delete user.signature;
