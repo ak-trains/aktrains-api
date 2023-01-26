@@ -55,71 +55,72 @@ class CustomHelperSerice{
     }
     
     static checkRateLimit(count,event){
-        const timeStamp = moment(new Date()).format("YYYYMMDDTHHmmss");
-        const currDate = timeStamp.substring(0,8);
-        let isAllowed;
+        // const timeStamp = moment(new Date()).format("YYYYMMDDTHHmmss");
+        // const currDate = timeStamp.substring(0,8);
+        // let isAllowed;
 
-        if(count.countOf!==currDate){
-            count.login=0;
-            count.challenge=0;
-            count.validate=0;
-            count.password=0;
-            count.sysReset=0;
-            count.sysCheck=0;
-            count.library=0;
-            count.details=0;
-            count.countOf=currDate,
-            count.updatedAt=timeStamp
-        };
+        // if(count.countOf!==currDate){
+        //     count.login=0;
+        //     count.challenge=0;
+        //     count.validate=0;
+        //     count.password=0;
+        //     count.sysReset=0;
+        //     count.sysCheck=0;
+        //     count.library=0;
+        //     count.details=0;
+        //     count.countOf=currDate,
+        //     count.updatedAt=timeStamp
+        // };
 
 
-        switch (event) {
+        // switch (event) {
 
-            case "login":
-               isAllowed = (count.login>-1&&count.login<4);
-               count.login = count.login+1;
-            break;
+        //     case "login":
+        //        isAllowed = (count.login>-1&&count.login<4);
+        //        count.login = count.login+1;
+        //     break;
              
-            case "challenge":
-                isAllowed = (count.challenge>-1&&count.challenge<4);
-                count.challenge = count.challenge+1;
-            break;
-            case "password":
-                isAllowed = (count.password>-1&&count.password<4);
-                count.password = count.password+1;
-            break;
+        //     case "challenge":
+        //         isAllowed = (count.challenge>-1&&count.challenge<4);
+        //         count.challenge = count.challenge+1;
+        //     break;
+        //     case "password":
+        //         isAllowed = (count.password>-1&&count.password<4);
+        //         count.password = count.password+1;
+        //     break;
 
-            case "validate":
-                isAllowed = (count.validate>-1&&count.validate<4);
-                count.validate = count.validate+1;
-            break; 
+        //     case "validate":
+        //         isAllowed = (count.validate>-1&&count.validate<4);
+        //         count.validate = count.validate+1;
+        //     break; 
 
-            case "sys-reset":
-                isAllowed = (count.sysReset>-1&&count.sysReset<4);
-                count.sysReset = count.sysReset+1;
-            break; 
+        //     case "sys-reset":
+        //         isAllowed = (count.sysReset>-1&&count.sysReset<4);
+        //         count.sysReset = count.sysReset+1;
+        //     break; 
 
-            case "sys-check":
-                isAllowed = (count.sysCheck>-1&&count.sysCheck<4);
-                count.sysCheck = count.sysCheck+1;
-            break; 
+        //     case "sys-check":
+        //         isAllowed = (count.sysCheck>-1&&count.sysCheck<4);
+        //         count.sysCheck = count.sysCheck+1;
+        //     break; 
 
-            case "library":
-                isAllowed = (count.library>-1&&count.library<4);
-                count.library = count.library+1;
-            break; 
+        //     case "library":
+        //         isAllowed = (count.library>-1&&count.library<4);
+        //         count.library = count.library+1;
+        //     break; 
 
-            case "details":
-                isAllowed = (count.details>-1&&count.details<4);
-                count.details = count.details+1;
-            break; 
+        //     case "details":
+        //         isAllowed = (count.details>-1&&count.details<4);
+        //         count.details = count.details+1;
+        //     break; 
         
-            default:
-                isAllowed=false;
-                break;
-        }
+        //     default:
+        //         isAllowed=false;
+        //         break;
+        // }
 
         const newCount = count;
+        const isAllowed = true;
 
         return {isAllowed,newCount};
     }
