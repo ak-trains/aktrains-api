@@ -13,7 +13,7 @@ app.use(express.urlencoded({extended:false}));
 
 app.use(express.json());
 
-const rtLimit = rateLimit({windowMs:60000,max:10,handler:(req,res,next,opt)=>{
+const rtLimit = rateLimit({windowMs:1000,max:1,handler:(req,res,next,opt)=>{
   return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
 }});
 

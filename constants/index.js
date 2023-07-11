@@ -1,5 +1,5 @@
 const PROTECTED_RESOURCE = "Unauthorized access of protected resource. Failed to verify the identity of requesting end.";
-const UNSUPPORTED_CLIENT= "This version of client app is no longer supported. Please download the latest version to continue.";
+const UNSUPPORTED_CLIENT= "This version of client app is no longer supported. Please download and install the new or latest version available from website to continue.";
 const UNDER_MAINTAINANCE = "Sorry for the inconvinience. The server is currently undergoing a scheduled maintainance.";
 const ACCESS_DENIED = "Either you are not logged in or you do not have permission to perform this action/use this service.";
 const INSUFFICIENT_PRIVILEGES = "You do not have the level of access to perform the action you requested. Please try again with valid authorization.";
