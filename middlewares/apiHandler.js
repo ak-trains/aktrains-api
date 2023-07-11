@@ -36,9 +36,9 @@ const apiHandler = async (req,res,next)=>{
 
     if(apiKey!==CLIENT_APP_KEY) return next(CustomErrorService.unAuthorizedAccess(PROTECTED_RESOURCE));
 
-    if(appId!==CLIENT_APP_ID) return next(CustomErrorService.serverUnavailable(UNSUPPORTED_CLIENT));
+    if(appId!==CLIENT_APP_ID) return next(CustomErrorService.unAuthorizedAccess(UNSUPPORTED_CLIENT));
 
-    if(appVer!==CLIENT_APP_VER) return next(CustomErrorService.serverUnavailable(UNSUPPORTED_CLIENT));
+    if(appVer!==CLIENT_APP_VER) return next(CustomErrorService.unAuthorizedAccess(UNSUPPORTED_CLIENT));
 
     return next();
 };
