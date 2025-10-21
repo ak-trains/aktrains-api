@@ -1,4 +1,4 @@
-import {APP_PORT} from "./config";
+import {APP_PORT} from "./config/index.js";
 import {errorHandler,apiHandler} from "./middlewares";
 import express from "express";
 import routes from "./routes";
