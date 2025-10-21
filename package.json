@@ -2,6 +2,9 @@
   "name": "aktrains-api",
   "version": "2.0.0",
   "description": "Official AKTrains API",
+   "engines": {
+    "node": "18.x"
+  }
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
