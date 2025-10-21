@@ -1,5 +1,5 @@
 import express from "express";
-import {validator} from "../validators";
+import {validator} from "../validators/index.js"
 import { rateLimit } from "express-rate-limit";
 import {authHandler} from "../middlewares"
 import {authController, recoveryController,userController} from "../controllers";
