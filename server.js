@@ -1,26 +1,24 @@
-import { APP_PORT } from "./config/index.js";
-import { errorHandler } from "./middlewares/index.js";
+import { APP_PORT } from "./config";
+import { errorHandler } from "./middlewares";
 import express from "express";
-import routes from "./routes/index.js";
-import { validator } from "./validators/index.js";
-import { CustomErrorService } from "./services/index.js";
+import routes from "./routes";
+import { validator } from "./validators";
+import { CustomErrorService } from "./services";
 import rateLimit from "express-rate-limit";  // Note: Use default import for consistency
-import { TOO_MANY_REQUESTS } from "./constants/index.js";
+import { TOO_MANY_REQUESTS } from "./constants";
 
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
+
 app.use(express.json());
 
-const limiter = rateLimit({
-  windowMs: 1000,  // 1 second window
-  max: 1,  // 1 request per window
-  handler: (req, res, next, optionsUsed) => {
+const rtLimit = rateLimit({windowMs: 1000,max: 1,handler:(req,res,next,opt)=>{
     return next(CustomErrorService.tooManyRequests(TOO_MANY_REQUESTS));
-  },
-});
+  }});
 
-app.use("/", limiter, validator.apiAuth()(apiHandler, routes));  // Assuming apiHandler is from middlewares
+app.use("/", rtLimit, validator.apiAuth(),apiHandler,routes);
+
 app.use(errorHandler);
 
-app.listen(APP_PORT, () => console.log(`Listening on port ${APP_PORT}`));
+app.listen(APP_PORT,()=>console.log(`Listening on port ${APP_PORT}`));
