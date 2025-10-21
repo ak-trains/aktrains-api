@@ -1,11 +1,11 @@
 import {APP_PORT} from "./config/index.js";
 import {errorHandler,apiHandler} from "./middlewares";
 import express from "express";
-import routes from "./routes";
-import { validator } from "./validators";
-import {CustomErrorService } from "./services";
+import routes from "./routes/index.js";
+import { validator } from "./validators/index.js";
+import {CustomErrorService } from "./services/index.js";
 import { rateLimit } from "express-rate-limit";
-import { TOO_MANY_REQUESTS } from "./constants";
+import { TOO_MANY_REQUESTS } from "./constants/index.js";
 
 const app = express();
 
