@@ -1,5 +1,5 @@
 import {APP_PORT} from "./config/index.js";
-import {errorHandler,apiHandler} from "./middlewares";
+import {errorHandler,apiHandler} from "./middlewares/index.js";
 import express from "express";
 import routes from "./routes/index.js";
 import { validator } from "./validators/index.js";
