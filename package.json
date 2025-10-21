@@ -1,12 +1,12 @@
 {
   "name": "aktrains-api",
-  "version": "2.6.7",
-  "type": "module",
+  "version": "2.0.0",
   "description": "Official AKtrains API",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" & exit 1",
-    "start": "node server.js"
+    "dev": "modemon -r esm server.js",
+    "start": "node -r esm server.js"
   },
   "repository": {
     "type": "git",
@@ -37,11 +37,5 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "overrides": {
-  "@google-cloud/firestore": "5.0.2"
   }
 }
