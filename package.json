@@ -1,47 +1,44 @@
 {
   "name": "aktrains-api",
-  "version": "2.0.0",
- "type": "module",
-  "description": "Official AKTrains API",
+  "version": "2.6.7",
+  "type": "module",
+  "description": "Official AKtrains API",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -r esm server.js",
+    "test": "echo \"Error: no test specified\" & exit 1",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ak-trains/aktrains-client-api.git"
+    "url": "https://github.com/aktrains/aktrains-client-api.git"
   },
   "keywords": [
-    "api",
     "aktrains",
-    "nodejs"
+    "node",
+    "es"
   ],
-  "author": "AKTrains",
+  "author": "AKtrains",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ak-trains/aktrains-client-api/issues"
-  },
-  "homepage": "https://github.com/ak-trains/aktrains-client-api#readme",
+  "homepage": "https://github.com/aktrains/aktrains-client-api#readme",
   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "crypto-js": "^4.1.1",
-    "dotenv": "^16.0.3",
-    "esm": "^3.2.25",
+    "@google-cloud/firestore": "^5.1.0",
+    "crypto-js": "^4.1.0",
+    "dotenv": "^2.0.0",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "express-validator": "^6.14.2",
     "firebase-admin": "^11.3.0",
-    "json-keys-sort": "^2.1.0",
+    "joi": "^17.8.0",
     "jsonwebtoken": "^9.0.0",
-    "moment": "^2.29.4",
-    "nodemailer": "^6.8.0",
-    "otp-generator": "^4.0.0",
-    "request-ip": "^3.3.0",
+    "mongoose": "^6.9.0",
+    "nodemailer": "^6.9.0",
+    "otp-generator": "^3.4.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
