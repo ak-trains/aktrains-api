@@ -338,8 +338,7 @@ const authController = {
             await historyRef.child(user.uid).push().set(history);
 
             const transporter = nodemailer.createTransport({
-                host:"us2.smtp.mailhostbox.com",
-                port: 587,
+                service: 'gmail',
                 secure:false,
                 auth: {user: MAIL_USERNAME,pass: MAIL_PASSWORD},
             });
